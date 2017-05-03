@@ -52,9 +52,11 @@ class Author
     @id = self.id()
     DB.exec("UPDATE authors SET name = '#{@name}' WHERE id = #{@id};")
 
-    attributes.fetch(:books_ids, []).each() do |actor_id|
-    DB.exec("INSERT INTO actors_movies (actor_id, movie_id) VALUES (#{actor_id}, #{self.id()});")
+    attributes.fetch(:books_ids, []).each() do |books_id|
+    DB.exec("INSERT INTO checkout (book_id, author_id) VALUES (#{book_id}, #{self.id()});")
   end
+end
+
 
   define_method(:delete) do
     DB.exec("DELETE FROM authors WHERE id = #{self.id()};")

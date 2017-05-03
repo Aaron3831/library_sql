@@ -71,9 +71,9 @@ describe(Author) do
     it("lets you associate an author to a book") do
       author = Author.new({:name => "Stephen King", :id => nil})
       author.save()
-      it = Book.new({:title => "IT", :id => nil})
+      it = Book.new({:title => "IT", :author_id => nil})
       it.save()
-      mist = Book.new({:name => "The Mist", :id => nil})
+      mist = Book.new({:title => "The Mist", :author_id => nil})
       mist.save()
       author.update({:books_ids => [it.id(), mist.id()]})
       expect(author.books()).to(eq([it, mist]))
@@ -102,4 +102,3 @@ describe(Author) do
       expect(Book.all()).to(eq([]))
     end
   end
-end
