@@ -52,10 +52,11 @@ describe(Author) do
     it("returns an array of books for that author") do
       test_author = Author.new({:name => "Epicodus stuff", :id => nil})
       test_author.save()
-      test_book = Book.new({:description => "Learn SQL", :author_id => test_author.id()})
+      test_book = Book.new({:id => nil, :title => "Learn SQL", :author_id => test_author.id()})
       test_book.save()
-      test_book2 = Book.new({:description => "Review Ruby", :author_id => test_author.id()})
+      test_book2 = Book.new({:id => nil, :title => "Review Ruby", :author_id => test_author.id()})
       test_book2.save()
+
       expect(test_author.books()).to(eq([test_book, test_book2]))
     end
   end
@@ -67,6 +68,19 @@ describe(Author) do
       author.update({:name => "Homework Stuff"})
       expect(author.name()).to(eq("Homework Stuff"))
     end
+    it("lets you associate an author to a book") do
+      author = Author.new({:name => "Stephen King", :id => nil})
+      author.save()
+      it = Book.new({:title => "IT", :id => nil})
+      it.save()
+      mist = Book.new({:name => "The Mist", :id => nil})
+      mist.save()
+      author.update({:books_ids => [it.id(), mist.id()]})
+      expect(author.books()).to(eq([it, mist]))
+    end
+  end
+
+
   end
   describe("#delete") do
     it("lets you delete a author from the database") do
@@ -80,9 +94,9 @@ describe(Author) do
     it("deletes a author's books from the database") do
       author = Author.new({:name => "Epicodus stuff", :id => nil})
       author.save()
-      book = Book.new({:description => "learn SQL", :author_id => author.id()})
+      book = Book.new({:id => nil, :title => "learn SQL", :author_id => author.id()})
       book.save()
-      book2 = Book.new({:description => "Review Ruby", :author_id => author.id()})
+      book2 = Book.new({:id => nil,:title => "Review Ruby", :author_id => author.id()})
       book2.save()
       author.delete()
       expect(Book.all()).to(eq([]))
