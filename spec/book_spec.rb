@@ -56,4 +56,19 @@ describe(Book) do
     end
   end
 
+  describe("#authors") do
+  it("returns all of the authors for a particular book") do
+    author = Author.new(:name => "Stephen King", :id => nil)
+    author.save()
+    author2 = Author.new(:name => "Homer", :id => nil)
+    author2.save()
+    book = Book.new(:title => "IT", :author_id => nil, :id => nil)
+    book.save()
+    book.update(:author_id => [author.id()])
+    book.update(:author_id => [author2.id()])
+
+    expect(book.authors()).to(eq([author, author2]))
+  end
+end
+
 end

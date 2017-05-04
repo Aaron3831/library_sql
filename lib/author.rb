@@ -1,3 +1,5 @@
+require('pry')
+
 class Author
   attr_reader(:name, :id)
 
@@ -48,11 +50,11 @@ class Author
   end
 
   define_method(:update) do |attributes|
-    @name = attributes.fetch(:name)
+    @name = attributes.fetch(:name, @name)
     @id = self.id()
     DB.exec("UPDATE authors SET name = '#{@name}' WHERE id = #{@id};")
 
-    attributes.fetch(:books_ids, []).each() do |books_id|
+    attributes.fetch(:book_ids, []).each() do |book_id|
     DB.exec("INSERT INTO checkout (book_id, author_id) VALUES (#{book_id}, #{self.id()});")
   end
 end
@@ -63,4 +65,8 @@ end
     DB.exec("DELETE FROM books WHERE author_id = #{self.id()};")
 
   end
+
+
+
+
 end

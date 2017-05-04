@@ -56,14 +56,13 @@ describe(Author) do
       test_book.save()
       test_book2 = Book.new({:id => nil, :title => "Review Ruby", :author_id => test_author.id()})
       test_book2.save()
-
       expect(test_author.books()).to(eq([test_book, test_book2]))
     end
   end
 
   describe('#update') do
     it('lets you update authors in the database') do
-      author = Author.new({:name => "Epicodus stuff", :id => nil})
+      author = Author.new({:name => "Stephen King", :id => nil})
       author.save()
       author.update({:name => "Homework Stuff"})
       expect(author.name()).to(eq("Homework Stuff"))
@@ -71,11 +70,11 @@ describe(Author) do
     it("lets you associate an author to a book") do
       author = Author.new({:name => "Stephen King", :id => nil})
       author.save()
-      it = Book.new({:title => "IT", :author_id => nil})
+      it = Book.new({:id => nil, :title => "IT", :author_id => nil})
       it.save()
-      mist = Book.new({:title => "The Mist", :author_id => nil})
+      mist = Book.new({:id => nil, :title => "The Mist", :author_id => nil})
       mist.save()
-      author.update({:books_ids => [it.id(), mist.id()]})
+      author.update({:book_ids => [it.id(), mist.id()]})
       expect(author.books()).to(eq([it, mist]))
     end
   end

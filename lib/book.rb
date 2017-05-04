@@ -3,7 +3,6 @@ class Book
 
   define_method(:initialize) do |attributes|
     @id = attributes.fetch(:id)
-
     @title = attributes.fetch(:title)
     @author_id = attributes.fetch(:author_id)
   end
@@ -41,11 +40,23 @@ class Book
 
   define_method(:update) do |attributes|
     @title = attributes.fetch(:title, @title)
-    @id = self.id()
-    DB.exec("UPDATE books SET title = '#{@title}' WHERE id = #{@id};")
-    attributes.fetch(:authors_ids, []).each() do |authors_id|
+    DB.exec("UPDATE books SET title = '#{@title}' WHERE id = #{self.id};")
+
+    attributes.fetch(:author_id, []).each() do |author_id|
     DB.exec("INSERT INTO checkout (author_id, book_id) VALUES (#{author_id}, #{self.id()});")
   end
+end
+
+define_method(:authors) do
+  checkout = []
+  results = DB.exec("SELECT author_id FROM checkout WHERE book_id = #{self.id()};")
+  results.each() do |result|
+    author_id = result.fetch("author_id").to_i()
+    author = DB.exec("SELECT * FROM authors WHERE id = #{author_id};")
+    name = author.first().fetch("name")
+    checkout.push(Author.new({:name => name, :id => author_id}))
+  end
+  checkout
 end
 
 
