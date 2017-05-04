@@ -1,10 +1,9 @@
 class Book
-  attr_reader(:id, :title, :author_id)
+  attr_reader(:id, :title)
 
   define_method(:initialize) do |attributes|
     @id = attributes.fetch(:id)
     @title = attributes.fetch(:title)
-    @author_id = attributes.fetch(:author_id)
   end
 
   define_singleton_method(:all) do
@@ -12,30 +11,25 @@ class Book
     books = []
     returned_book.each() do |book|
       title = book.fetch("title")
-      author_id = book.fetch("author_id").to_i() # The information comes out of the database as a string.
       id = book.fetch("id").to_i()
-      books.push(Book.new({:id => id, :title => title, :author_id => author_id}))
+      books.push(Book.new({:id => id, :title => title}))
     end
     books
   end
 
   define_method(:save) do
-    result = DB.exec("INSERT INTO books (title, author_id) VALUES ('#{@title}', #{@author_id}) RETURNING id;")
+    result = DB.exec("INSERT INTO books (title) VALUES ('#{@title}') RETURNING id;")
     @id = result.first().fetch('id').to_i()
   end
 
   define_method(:==) do |another_book|
-    self.title().==(another_book.title()).&(self.author_id().==(another_book.author_id()))
+    self.title().==(another_book.title()).&(self.id().==(another_book.id()))
   end
 
   define_singleton_method(:find) do |id|
-    found_book = nil
-    Book.all().each() do |book|
-      if book.id() == id.to_i()
-        found_book = book
-      end
-    end
-    found_book
+    result = DB.exec("SELECT * FROM books WHERE id = #{id};")
+    title = result.first().fetch('title')
+    Book.new({:title => title, :id => id})
   end
 
   define_method(:update) do |attributes|
@@ -47,18 +41,20 @@ class Book
   end
 end
 
-define_method(:authors) do
-  checkout = []
-  results = DB.exec("SELECT author_id FROM checkout WHERE book_id = #{self.id()};")
-  results.each() do |result|
-    author_id = result.fetch("author_id").to_i()
-    author = DB.exec("SELECT * FROM authors WHERE id = #{author_id};")
-    name = author.first().fetch("name")
-    checkout.push(Author.new({:name => name, :id => author_id}))
+  define_method(:authors) do
+    checkout = []
+    results = DB.exec("SELECT author_id FROM checkout WHERE book_id = #{self.id()};")
+    results.each() do |result|
+      author_id = result.fetch("author_id").to_i()
+      author = DB.exec("SELECT * FROM authors WHERE id = #{author_id};")
+      name = author.first().fetch("name")
+      checkout.push(Author.new({:name => name, :id => author_id}))
+    end
+    checkout
   end
-  checkout
-end
 
-
-
+  define_method(:delete) do
+    DB.exec("DELETE FROM checkout WHERE book_id = #{self.id()};")
+    DB.exec("DELETE FROM books WHERE id = #{self.id()};")
+  end
 end

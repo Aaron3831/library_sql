@@ -29,22 +29,19 @@ class Author
   end
 
   define_singleton_method(:find) do |id|
-    found_author = nil
-    Author.all().each() do |author|
-      if author.id().==(id)
-        found_author = author
-      end
-    end
-    found_author
+    result = DB.exec("SELECT * FROM authors WHERE id = #{id};")
+    name = result.first().fetch('name')
+    Author.new({:name => name, :id => id})
   end
 
   define_method(:books) do
     author_books = []
-    books = DB.exec("SELECT * FROM books WHERE author_id = #{self.id()};")
-    books.each() do |book|
-      title = book.fetch("title")
-      author_id = book.fetch("author_id").to_i()
-      author_books.push(Book.new({:id => id, :title => title, :author_id => author_id}))
+    results = DB.exec("SELECT book_id FROM checkout WHERE author_id = #{self.id()};")
+    results.each() do |result|
+      book_id = result.fetch("book_id").to_i()
+      book = DB.exec("SELECT * FROM books WHERE id = #{book_id};")
+      title = book.first().fetch("title")
+      author_books.push(Book.new({:id => book_id, :title => title}))
     end
     author_books
   end
@@ -58,15 +55,8 @@ class Author
     DB.exec("INSERT INTO checkout (book_id, author_id) VALUES (#{book_id}, #{self.id()});")
   end
 end
-
-
   define_method(:delete) do
+    DB.exec("DELETE FROM checkout WHERE author_id = #{self.id()};")
     DB.exec("DELETE FROM authors WHERE id = #{self.id()};")
-    DB.exec("DELETE FROM books WHERE author_id = #{self.id()};")
-
   end
-
-
-
-
 end

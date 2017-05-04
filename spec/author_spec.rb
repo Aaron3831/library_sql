@@ -50,13 +50,14 @@ describe(Author) do
 
   describe("#books") do
     it("returns an array of books for that author") do
-      test_author = Author.new({:name => "Epicodus stuff", :id => nil})
-      test_author.save()
-      test_book = Book.new({:id => nil, :title => "Learn SQL", :author_id => test_author.id()})
-      test_book.save()
-      test_book2 = Book.new({:id => nil, :title => "Review Ruby", :author_id => test_author.id()})
-      test_book2.save()
-      expect(test_author.books()).to(eq([test_book, test_book2]))
+      author = Author.new({:name => "Epicodus stuff", :id => nil})
+      author.save()
+      book = Book.new({:title => "Learn SQL", :id => nil})
+      book.save()
+      book2 = Book.new({:title => "Review Ruby", :id => nil})
+      book2.save()
+      author.update({:book_ids => [book.id(), book2.id()]})
+      expect(author.books()).to(eq([book, book2]))
     end
   end
 
@@ -90,14 +91,15 @@ describe(Author) do
       author.delete()
       expect(Author.all()).to(eq([author2]))
     end
-    it("deletes a author's books from the database") do
+    it("deletes an author's books from the database") do
       author = Author.new({:name => "Epicodus stuff", :id => nil})
       author.save()
       book = Book.new({:id => nil, :title => "learn SQL", :author_id => author.id()})
       book.save()
       book2 = Book.new({:id => nil,:title => "Review Ruby", :author_id => author.id()})
       book2.save()
-      author.delete()
+      book.delete()
+      book2.delete()
       expect(Book.all()).to(eq([]))
     end
   end
